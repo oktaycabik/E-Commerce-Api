@@ -7,9 +7,9 @@ const ProductSchema = new Schema({
     type: String,
     required: true,
   },
-  product_image:{
-    type : String,
-    default : "default.jpg"
+  product_image: {
+    type: String,
+    default: "default.jpg",
   },
   brand: {
     type: String,
@@ -21,22 +21,52 @@ const ProductSchema = new Schema({
   details: {
     type: String,
   },
-  orderCount:{
-    type:Number,
-    default:0
+  features: {
+    color: {
+      type: String,
+    },
+    ram: {
+      type: String,
+    },
+    ssd: {
+      type: String,
+    },
+    core: {
+      type: String,
+    },
+    use_area: {
+      type: String,
+    },
+    size: [
+      {
+        type: String,
+      },
+    ],
+
+    display_card: {
+      type: String,
+    },
   },
-  order:[{
-    type: moongose.Schema.ObjectId,
-    ref: "Order",
-  }],
-  favoriCount:{
-    type:Number,
-    default:0
+  orderCount: {
+    type: Number,
+    default: 0,
   },
-  favori:[{
-    type: moongose.Schema.ObjectId,
-    ref: "User",
-  }],
+  order: [
+    {
+      type: moongose.Schema.ObjectId,
+      ref: "Order",
+    },
+  ],
+  favoriCount: {
+    type: Number,
+    default: 0,
+  },
+  favori: [
+    {
+      type: moongose.Schema.ObjectId,
+      ref: "User",
+    },
+  ],
   likes: [
     {
       type: moongose.Schema.ObjectId,
@@ -49,7 +79,6 @@ const ProductSchema = new Schema({
   },
   category: {
     type: String,
-   
   },
 });
 

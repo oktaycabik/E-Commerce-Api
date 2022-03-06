@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const bcrypt =require("bcrypt")
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const Schema = mongoose.Schema;
@@ -7,7 +7,7 @@ const Schema = mongoose.Schema;
 const UserSchema = new Schema({
   name: {
     type: String,
-    required: [true, "Please provide a name"],
+    
   },
   email: {
     type: String,
@@ -32,21 +32,43 @@ const UserSchema = new Schema({
   phone_number: {
     type: String,
   },
-  adress: {
+  gender: {
     type: String,
   },
+  birth_date: {
+    type: String,
+  },
+  adress: 
+    {
+      title: {
+        type: String,
+      },
+      country: {
+        type: String,
+      },
+      city: {
+        type: String,
+      },
+      district: {
+        type: String,
+      },
+      details: {
+        type: String,
+      },
+    },
+  
   myorder: [
     {
       type: mongoose.Schema.ObjectId,
-      
+
       ref: "Order",
     },
   ],
- 
+
   favorites: [
     {
       type: mongoose.Schema.ObjectId,
-      
+
       ref: "Product",
     },
   ],
@@ -54,33 +76,30 @@ const UserSchema = new Schema({
     type: Boolean,
     default: false,
   },
-  
 });
-UserSchema.pre("save",function (next) {
-    
-
-    if (!this.isModified("password")){
-        next();
-    }
-    bcrypt.genSalt(10, (err, salt) => {
-        if (err) next(err);
-        bcrypt.hash(this.password, salt, (err, hash) => {
-            if (err) next(err);
-            this.password = hash;
-            next();
-        });
+UserSchema.pre("save", function (next) {
+  if (!this.isModified("password")) {
+    next();
+  }
+  bcrypt.genSalt(10, (err, salt) => {
+    if (err) next(err);
+    bcrypt.hash(this.password, salt, (err, hash) => {
+      if (err) next(err);
+      this.password = hash;
+      next();
     });
+  });
 });
-UserSchema.methods.generateJwtFromUser = function() {
-    const {JWT_SECRET_KEY,JWT_EXPIRE} = process.env;
-    
-    const payload = {
-        id : this._id,
-        name : this.name
-    };
-    const token = jwt.sign(payload, JWT_SECRET_KEY, {expiresIn : JWT_EXPIRE});
+UserSchema.methods.generateJwtFromUser = function () {
+  const { JWT_SECRET_KEY, JWT_EXPIRE } = process.env;
 
-    return token;
+  const payload = {
+    id: this._id,
+    name: this.name,
+  };
+  const token = jwt.sign(payload, JWT_SECRET_KEY, { expiresIn: JWT_EXPIRE });
+
+  return token;
 };
 
 module.exports = mongoose.model("User", UserSchema);

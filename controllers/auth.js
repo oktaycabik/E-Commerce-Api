@@ -1,111 +1,103 @@
 const User = require("../models/User");
-const Product =require("../models/Product")
-const asyncErrorWrapper=require("express-async-handler")
-const {validateUserInput,comparePassword}=require("../helpers/authorization/inputHelpers")
-const {sendJwtToClient}=require("../helpers/authorization/tokenHelpers")
+const Product = require("../models/Product");
+const asyncErrorWrapper = require("express-async-handler");
+const {
+  validateUserInput,
+  comparePassword,
+} = require("../helpers/authorization/inputHelpers");
+const { sendJwtToClient } = require("../helpers/authorization/tokenHelpers");
 const CustomError = require("../helpers/error/customError");
-const register =asyncErrorWrapper( async (req, res, next) => {
-  
-   const {name,email,password,role}=req.body;
+const register = asyncErrorWrapper(async (req, res, next) => {
+  const { name, email, password, role } = req.body;
   const user = await User.create({
     name,
     email,
-    password, 
+    password,
     role,
   });
-  sendJwtToClient(user,res)
-  
-} );
-const getUser=(req,res,next)=>{
-  
+  sendJwtToClient(user, res);
+});
+const getUser = (req, res, next) => {
   res.json({
-    success:true,
-    data:{
-      id:req.user.id,
-      name:req.user.name,
-      favorites:req.user.favorites
-    }
-  })
-}
-const login = asyncErrorWrapper(async (req,res,next) => {
+    success: true,
+    data: {
+      id: req.user.id,
+      name: req.user.name,
+      favorites: req.user.favorites,
+    },
+  });
+};
+const login = asyncErrorWrapper(async (req, res, next) => {
+  const { email, password } = req.body;
 
-  const {email,password} = req.body;
-  
-  if(!validateUserInput(email,password)) {
-      return next(new CustomError("Please check your inputs",400));
-  }
-  
-  const user = await User.findOne({email}).select("+password");
-
-  if ( !user || !comparePassword(password,user.password)) {
-      
-      return next(new CustomError("Please check your credentials",404));
+  if (!validateUserInput(email, password)) {
+    return next(new CustomError("Please check your inputs", 400));
   }
 
+  const user = await User.findOne({ email }).select("+password");
 
-  sendJwtToClient(user,res,200);
-  
+  if (!user || !comparePassword(password, user.password)) {
+    return next(new CustomError("Please check your credentials", 404));
+  }
 
+  sendJwtToClient(user, res, 200);
 });
 
-const logout = asyncErrorWrapper(async (req,res,next) =>{
-   
-  const {NODE_ENV} = process.env;
-  
+const logout = asyncErrorWrapper(async (req, res, next) => {
+  const { NODE_ENV } = process.env;
+
   // Send To Client With Res
-  
+
   return res
-  .status(200)
-  .cookie("token",null, {
-      httpOnly : true,
-      expires : new Date(Date.now()),
-      secure : NODE_ENV === "development" ? false : true
-  })
-  .json({
-      success : true,
-      message : "Logout Successfull"
-  });
-  
+    .status(200)
+    .cookie("token", null, {
+      httpOnly: true,
+      expires: new Date(Date.now()),
+      secure: NODE_ENV === "development" ? false : true,
+    })
+    .json({
+      success: true,
+      message: "Logout Successfull",
+    });
 });
 const favoriteProducts = asyncErrorWrapper(async (req, res, next) => {
-  const {id} =req.params;
-  
-  
-  const user=await User.findById(req.user.id);
-  if(user.favorites.includes(id)){
-    return next(new CustomError("you allready like this product"))
+  const { id } = req.params;
+
+  const user = await User.findById(req.user.id);
+  if (user.favorites.includes(id)) {
+    return next(new CustomError("you allready like this product"));
   }
-  user.favorites.push(id)
-  await user.save()
-  return res.status(200)
-  .json({
-    success:true,
-    user
-  })
+  user.favorites.push(id);
+  await user.save();
+  return res.status(200).json({
+    success: true,
+    user,
+  });
 });
 const undoFavoritesProduct = asyncErrorWrapper(async (req, res, next) => {
-  const {id} =req.params;
-  const user=await User.findById(req.user.id);
- 
-  if(!user.favorites.includes(id)){
-    return next(new CustomError("You can undo like operition for this product",400))
+  const { id } = req.params;
+  const user = await User.findById(req.user.id);
+
+  if (!user.favorites.includes(id)) {
+    return next(
+      new CustomError("You can undo like operition for this product", 400)
+    );
   }
-  const index=user.favorites.indexOf(id)
-  
-  user.favorites.splice(index,1)
+  const index = user.favorites.indexOf(id);
+
+  user.favorites.splice(index, 1);
 
   await user.save();
 
-  return res.status(200)
-  .json({
-    success:true,
-    user 
-  })
+  return res.status(200).json({
+    success: true,
+    user,
+  });
 });
 const getUserById = asyncErrorWrapper(async (req, res, next) => {
   const user = await User.findById({ _id: req.params.id }).populate({
-    path:"favorites",
-    select:"name price product_image"
+    path: "favorites",
+    select: "name price product_image",
   });
   res.status(200).json({
     success: true,
@@ -113,15 +105,27 @@ const getUserById = asyncErrorWrapper(async (req, res, next) => {
   });
 });
 const editUser = asyncErrorWrapper(async (req, res, next) => {
+  const { id } = req.params;
+  const { phone_number } = req.body;
+  const { adress } = req.body;
+  const {name }=req.body
+  const {gender }=req.body
+  const {birth_date }=req.body
+ 
+  let user = await User.findById(id);
   
-  const {id} =req.params
-  const {phone_number,adress}  = req.body
-  let user =await User.findById(id)
-  
-   user.phone_number=phone_number
-   user.adress=adress
+  user.phone_number = phone_number;
+  user.adress.title = adress.title;
 
-   user =await user.save()
+  user.adress.country = adress.country;
+  user.adress.city = adress.city;
+  user.adress.district = adress.district;
+  user.adress.details = adress.details;
+  user.name=name;
+  user.gender=gender;
+  user.birth_date=birth_date;
+  
+  user = await user.save();
   res.status(200).json({
     success: true,
     user,
@@ -135,5 +139,5 @@ module.exports = {
   getUserById,
   logout,
   undoFavoritesProduct,
-  editUser
+  editUser,
 };

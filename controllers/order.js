@@ -4,18 +4,19 @@ const CustomError = require("../helpers/error/customError");
 
 
 const newOrder = asyncErrorWrapper(async (req, res, next) => {
-    const product = req.body;
-   console.log(product)
+  
+  console.log('order', req.body.product[0].product_id)
     const order = await Order.create({
         
       product:req.body.product,
-      
+     
       user:req.user.id
     });
     res.status(201).json({
       success: true,
       data:order,
     });
+ 
   });
   const getByOrderUser = asyncErrorWrapper(async (req, res, next) => {
       const {id}=req.params

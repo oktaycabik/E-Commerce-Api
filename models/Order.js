@@ -3,13 +3,18 @@ const Product = require("./Product");
 const Schema = moongose.Schema;
 
 const OrderSchema = new Schema({
-  product: [
-    {
-      type: moongose.Schema.ObjectId,
-      required: true,
-      ref: "Product",
+  product: [{ 
+   product_id: {
+      type:String,
+      required:true
     },
-  ],
+    quantity: {
+      type: Number,
+      
+      
+    },
+  }],
+
   user: {
     type: moongose.Schema.Types.ObjectId,
 
@@ -19,11 +24,11 @@ const OrderSchema = new Schema({
 });
 OrderSchema.pre("save", async function (next) {
   try {
-    
-    const product = await Product.findById(this.product);
+   
+    const product = await Product.findById(this.product.map(a=>a.product_id));
     console.log("asdasd", product);
     product.order.push(this._id);
-    product.orderCount=product.order.length;
+    product.orderCount = product.order.length;
     await product.save();
     next();
   } catch (err) {

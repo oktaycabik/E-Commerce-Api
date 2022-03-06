@@ -3,14 +3,15 @@ const asyncErrorWrapper = require("express-async-handler");
 const CustomError = require("../helpers/error/customError");
 
 const newProduct = asyncErrorWrapper(async (req, res, next) => {
-  const { name,category,brand,price,details } = req.body;
-
+  const { name,category,brand,price,details,features} = req.body;
+console.log('features', features)
   const product = await Product.create({
     name,
     category,
     brand,
     price,
     details,
+    features,
   });
   res.status(201).json({
     success: true,
@@ -47,6 +48,14 @@ const getAllProducts = asyncErrorWrapper(async (req, res, next) => {
     detailsObject["details"]=regex;
     query=query.where(detailsObject)
    }
+   if(req.query.core){
+    const coreObject={};
+    const regex=new RegExp(req.query.core,"i")
+    coreObject["features.core"]=regex;
+    query=query.where(coreObject)
+    console.log('regex', coreObject)
+   }
+   
      const sortKey=req.query.sortBy;
      if(sortKey==="most-order"){
         query=query.sort("-orderCount")
