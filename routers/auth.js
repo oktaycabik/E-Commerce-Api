@@ -4,7 +4,7 @@ const router = express.Router();
 const {getAccessToRoute}=require("../middlewares/authorization/auth")
 
 router.post("/register",register );
-router.get("/:id",getUserById)
+router.get("/user/get",getAccessToRoute,getUserById)
 router.post("/login",login );
 router.get("/undo_favorites/:id",getAccessToRoute,undoFavoritesProduct)
 router.get("/favorites/:id",getAccessToRoute,favoriteProducts)

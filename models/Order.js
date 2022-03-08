@@ -5,8 +5,10 @@ const Schema = moongose.Schema;
 const OrderSchema = new Schema({
   product: [{ 
    product_id: {
-      type:String,
-      required:true
+    type: moongose.Schema.Types.ObjectId,
+
+    required: true,
+    ref: "Product",
     },
     quantity: {
       type: Number,

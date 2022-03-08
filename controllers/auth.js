@@ -95,7 +95,7 @@ const undoFavoritesProduct = asyncErrorWrapper(async (req, res, next) => {
   });
 });
 const getUserById = asyncErrorWrapper(async (req, res, next) => {
-  const user = await User.findById({ _id: req.params.id }).populate({
+  const user = await User.findById( req.user.id ).populate({
     path: "favorites",
     select: "name price product_image",
   });
@@ -114,16 +114,25 @@ const editUser = asyncErrorWrapper(async (req, res, next) => {
  
   let user = await User.findById(id);
   
-  user.phone_number = phone_number;
-  user.adress.title = adress.title;
-
-  user.adress.country = adress.country;
-  user.adress.city = adress.city;
-  user.adress.district = adress.district;
-  user.adress.details = adress.details;
-  user.name=name;
-  user.gender=gender;
-  user.birth_date=birth_date;
+ 
+  if(phone_number){
+    user.phone_number = phone_number;
+  }
+  if(adress){
+    user.adress=adress
+  }
+  if(name){
+    user.name=name;
+  }
+  if(gender){
+    user.gender=gender;
+  }
+  if(birth_date){
+    user.birth_date=birth_date;
+  }
+ 
+  
+  
   
   user = await user.save();
   res.status(200).json({
