@@ -11,6 +11,10 @@ const ProductSchema = new Schema({
     type: String,
     default: "default.jpg",
   },
+  quantity: {
+    default:1,
+    type: Number,
+  },
   brand: {
     type: String,
   },

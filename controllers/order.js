@@ -23,11 +23,11 @@ const newOrder = asyncErrorWrapper(async (req, res, next) => {
     const order = await Order.find({user:id})
     .populate({
         path:"product user",
-        select:"name price name email",
+        select:"name quantity price name email",
         
         
     });
-    
+   
     res.status(200).json({
       success: true,
       order,
