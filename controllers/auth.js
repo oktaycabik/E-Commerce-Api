@@ -97,11 +97,18 @@ const undoFavoritesProduct = asyncErrorWrapper(async (req, res, next) => {
 const getUserById = asyncErrorWrapper(async (req, res, next) => {
   const user = await User.findById( req.user.id ).populate({
     path: "favorites",
-    select: "name price product_image",
+    select: "name price brand product_image",
   });
   res.status(200).json({
     success: true,
     user,
+  });
+});
+const getAllUser = asyncErrorWrapper(async (req, res, next) => {
+  const users=await User.find()
+  res.status(200).json({
+    success: true,
+    users,
   });
 });
 const editUser = asyncErrorWrapper(async (req, res, next) => {
@@ -149,4 +156,5 @@ module.exports = {
   logout,
   undoFavoritesProduct,
   editUser,
+  getAllUser,
 };

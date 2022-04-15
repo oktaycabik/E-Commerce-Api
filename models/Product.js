@@ -1,5 +1,5 @@
 const moongose = require("mongoose");
-
+const slugify = require("slugify")
 const Schema = moongose.Schema;
 
 const ProductSchema = new Schema({
@@ -25,6 +25,7 @@ const ProductSchema = new Schema({
   details: {
     type: String,
   },
+  slug: String,
   features: {
     color: {
       type: String,
@@ -85,5 +86,18 @@ const ProductSchema = new Schema({
     type: String,
   },
 });
-
+ProductSchema.pre("save",function(next){
+if(!this.isModified("title")){
+  next();
+}
+this.slug=this.makeSlug()
+next()
+})
+ProductSchema.methods.makeSlug=function(){
+  return slugify(this.name,{
+    replacement:"-",
+    remove:/[*+,"!':@]/g,
+    lower:true
+  })
+}
 module.exports = moongose.model("Product", ProductSchema);

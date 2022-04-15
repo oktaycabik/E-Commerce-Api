@@ -23,7 +23,7 @@ const newOrder = asyncErrorWrapper(async (req, res, next) => {
     const order = await Order.find({user:id})
     .populate({
         path:"product user",
-        select:"name quantity price name email",
+        select:"name quantity price product_image name email",
         
         
     });
